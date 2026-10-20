@@ -1,0 +1,362 @@
+
+<div class="admin-root">
+
+  <header class="topbar">
+    <a href="/" class="brand">✦ EVENT<span>LY</span></a>
+    <a href="/" class="website-link">↗ View Website</a>
+  </header>
+
+  <!-- LOGIN -->
+  <section *ngIf="!admin.isLoggedIn" class="login-page">
+    <div class="login-card">
+      <span class="eyebrow">✦ ADMIN ACCESS</span>
+      <h1>Welcome <em>back.</em></h1>
+      <p>Sign in to manage your EVENTLY platform.</p>
+
+      <form (ngSubmit)="login()">
+        <label>Username</label>
+        <input
+          name="username"
+          [(ngModel)]="username"
+          required
+          autocomplete="username"
+        />
+
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          required
+          autocomplete="current-password"
+        />
+
+        <p class="error" *ngIf="error">{{ error }}</p>
+
+        <button class="btn primary" type="submit" [disabled]="loginBusy">
+          {{ loginBusy ? 'Signing in...' : 'Sign In ↗' }}
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <div *ngIf="admin.isLoggedIn" class="layout">
+
+    <aside class="sidebar">
+      <h4>WORKSPACE</h4>
+
+      <button
+        [class.active]="activeTab === 'overview'"
+        (click)="setTab('overview')"
+      >▦ Overview</button>
+
+      <button
+        [class.active]="activeTab === 'events'"
+        (click)="setTab('events')"
+      >✦ Events</button>
+
+      <button
+        [class.active]="activeTab === 'orders'"
+        (click)="setTab('orders')"
+      >▤ Reservations</button>
+
+      <button
+        [class.active]="activeTab === 'tickets'"
+        (click)="setTab('tickets')"
+      >▣ Tickets</button>
+
+      <button class="logout" (click)="logout()">↪ Logout</button>
+    </aside>
+
+    <main class="workspace">
+
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">✦ EVENTLY MANAGEMENT</span>
+
+          <h1 *ngIf="activeTab === 'overview'">
+            Dashboard <em>Overview.</em>
+          </h1>
+          <h1 *ngIf="activeTab === 'events'">
+            Manage <em>Events.</em>
+          </h1>
+          <h1 *ngIf="activeTab === 'orders'">
+            Your <em>Reservations.</em>
+          </h1>
+          <h1 *ngIf="activeTab === 'tickets'">
+            Digital <em>Tickets.</em>
+          </h1>
+
+          <p>Manage your event platform in one place.</p>
+        </div>
+
+        <button class="btn outline" (click)="refresh()" [disabled]="busy">
+          {{ busy ? 'Loading...' : '↻ Refresh' }}
+        </button>
+      </div>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <p class="success" *ngIf="notice">{{ notice }}</p>
+
+      <!-- OVERVIEW -->
+      <section *ngIf="activeTab === 'overview'">
+
+        <div class="stats" *ngIf="stats as s">
+          <div class="stat">
+            <span>TOTAL EVENTS</span>
+            <strong>{{ s.total_events }}</strong>
+            <small>Published events</small>
+          </div>
+
+          <div class="stat">
+            <span>RESERVATIONS</span>
+            <strong>{{ s.total_orders }}</strong>
+            <small>{{ s.paid_orders }} paid (demo)</small>
+          </div>
+
+          <div class="stat">
+            <span>TICKETS ISSUED</span>
+            <strong>{{ s.tickets_issued }}</strong>
+            <small>{{ s.tickets_checked_in }} checked in</small>
+          </div>
+
+          <div class="stat">
+            <span>DEMO REVENUE</span>
+            <strong>
+              {{ s.demo_revenue_tnd | number:'1.2-2' }}
+              <small>TND</small>
+            </strong>
+            <small>Simulated payments</small>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Recent Reservations</h2>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>ORDER</th>
+                  <th>EVENT</th>
+                  <th>CUSTOMER</th>
+                  <th>AMOUNT</th>
+                  <th>STATUS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let order of orders.slice(0, 6)">
+                  <td>#{{ order.id }}</td>
+                  <td>{{ order.event_name }}</td>
+                  <td>{{ order.customer_email }}</td>
+                  <td>{{ order.amount }} TND</td>
+                  <td>
+                    <span class="status" [class.paid]="order.status === 'PAID'">
+                      {{ order.status }}
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="orders.length === 0">
+                  <td colspan="5">No reservations yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- EVENTS -->
+      <section *ngIf="activeTab === 'events'" class="panel">
+        <div class="panel-heading">
+          <h2>All Events ({{ events.length }})</h2>
+          <button class="btn primary" (click)="newEvent()">
+            + Add Event
+          </button>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>EVENT</th>
+                <th>LOCATION</th>
+                <th>DATE</th>
+                <th>PRICE</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let event of events">
+                <td>#{{ event.id }}</td>
+                <td><strong>{{ event.name }}</strong></td>
+                <td>{{ event.location }}</td>
+                <td>{{ event.event_date | date:'medium' }}</td>
+                <td>{{ event.price }} TND</td>
+                <td>
+                  <button class="link-btn" (click)="editEvent(event)">
+                    Edit
+                  </button>
+                  <button class="link-btn danger" (click)="deleteEvent(event)">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="events.length === 0">
+                <td colspan="6">No events found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- RESERVATIONS -->
+      <section *ngIf="activeTab === 'orders'" class="panel">
+        <h2>Reservations ({{ orders.length }})</h2>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>ORDER</th>
+                <th>EVENT</th>
+                <th>EMAIL</th>
+                <th>DATE</th>
+                <th>AMOUNT</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of orders">
+                <td>#{{ order.id }}</td>
+                <td>{{ order.event_name }}</td>
+                <td>{{ order.customer_email }}</td>
+                <td>{{ order.created_at | date:'medium' }}</td>
+                <td>{{ order.amount }} {{ order.currency }}</td>
+                <td>
+                  <span class="status" [class.paid]="order.status === 'PAID'">
+                    {{ order.status }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="orders.length === 0">
+                <td colspan="6">No reservations yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TICKETS -->
+      <section *ngIf="activeTab === 'tickets'" class="panel">
+        <h2>Digital Tickets ({{ tickets.length }})</h2>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>TICKET</th>
+                <th>ORDER</th>
+                <th>EVENT</th>
+                <th>EMAIL</th>
+                <th>CHECK-IN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let ticket of tickets">
+                <td>#{{ ticket.id }}</td>
+                <td>#{{ ticket.order_id }}</td>
+                <td>{{ ticket.event_name }}</td>
+                <td>{{ ticket.customer_email }}</td>
+                <td>
+                  <span
+                    class="status"
+                    [class.paid]="ticket.used_at !== null"
+                  >
+                    {{ ticket.used_at ? 'USED' : 'AVAILABLE' }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="tickets.length === 0">
+                <td colspan="5">No tickets issued yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ADD / EDIT EVENT MODAL -->
+  <div class="modal-backdrop" *ngIf="showForm">
+    <div class="modal">
+      <div class="panel-heading">
+        <h2>{{ editingId === null ? 'Add Event' : 'Edit Event' }}</h2>
+        <button class="link-btn" (click)="showForm = false">✕</button>
+      </div>
+
+      <form (ngSubmit)="saveEvent()">
+        <label>Event Name</label>
+        <input
+          name="name"
+          [(ngModel)]="form.name"
+          required
+          maxlength="150"
+        />
+
+        <label>Description</label>
+        <textarea
+          name="description"
+          [(ngModel)]="form.description"
+          rows="3"
+        ></textarea>
+
+        <label>Location</label>
+        <input
+          name="location"
+          [(ngModel)]="form.location"
+          required
+        />
+
+        <label>Date & Time</label>
+        <input
+          type="datetime-local"
+          name="event_date"
+          [(ngModel)]="form.event_date"
+          required
+        />
+
+        <label>Price (TND)</label>
+        <input
+          type="number"
+          name="price"
+          [(ngModel)]="form.price"
+          min="0"
+          step="0.01"
+          required
+        />
+
+        <p *ngIf="error" class="error">{{ error }}</p>
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="btn outline"
+            (click)="showForm = false"
+          >Cancel</button>
+
+          <button
+            type="submit"
+            class="btn primary"
+            [disabled]="saving"
+          >
+            {{ saving ? 'Saving...' : 'Save Event ↗' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>

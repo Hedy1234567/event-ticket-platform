@@ -1,0 +1,339 @@
+
+<div class="site">
+
+  <header class="navbar">
+    <a class="brand" href="/">
+      <span class="brand-icon">✦</span>
+      EVENT<span class="brand-accent">LY</span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="#events">Explore Events</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#about">About</a>
+    </nav>
+
+    <a class="nav-button" href="#events">Get Tickets ↗</a>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="hero-overlay"></div>
+
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="live-dot"></span>
+          DISCOVER WHAT'S HAPPENING
+        </div>
+
+        <h1>
+          UNFORGETTABLE<br>
+          <span>EXPERIENCES</span><br>
+          START HERE.
+        </h1>
+
+        <p>
+          Discover the best concerts, conferences and live
+          experiences in Tunisia. Your next great memory
+          is just one ticket away.
+        </p>
+
+        <div class="hero-actions">
+          <button class="primary-btn" (click)="scrollToEvents()">
+            Explore Events <span>↗</span>
+          </button>
+          <a href="#how-it-works" class="secondary-btn">
+            How It Works
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div>
+            <strong>{{ events.length }}</strong>
+            <span>Live Events</span>
+          </div>
+          <div>
+            <strong>100%</strong>
+            <span>Digital Tickets</span>
+          </div>
+          <div>
+            <strong>QR</strong>
+            <span>Easy Entry</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-decoration">LIVE<br>THE<br>MOMENT.</div>
+    </section>
+
+    <section class="events-section" id="events">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">✦ THE LINEUP</span>
+          <h2>Explore <span>Events.</span></h2>
+          <p>Find something worth going out for.</p>
+        </div>
+        <span class="event-count">
+          {{ filteredEvents.length }} EVENTS
+        </span>
+      </div>
+
+      <div class="filters">
+        <div class="search-box">
+          <span>⌕</span>
+          <input
+            type="text"
+            [(ngModel)]="search"
+            placeholder="Search events..."
+            aria-label="Search events"
+          />
+        </div>
+
+        <div class="category-buttons">
+          <button
+            *ngFor="let category of categories"
+            [class.active]="selectedCategory === category"
+            (click)="selectedCategory = category"
+          >
+            {{ category }}
+          </button>
+        </div>
+      </div>
+
+      <p *ngIf="loading" class="state-message">
+        Loading events...
+      </p>
+
+      <p *ngIf="error" class="state-message error">
+        {{ error }}
+      </p>
+
+      <div class="events-grid" *ngIf="!loading && !error">
+        <article
+          class="event-card"
+          *ngFor="let event of filteredEvents"
+        >
+          <div class="card-image">
+            <img
+              [src]="getEventImage(event)"
+              [alt]="event.name"
+              loading="lazy"
+            />
+            <span class="category-label">
+              {{ getCategory(event) }}
+            </span>
+          </div>
+
+          <div class="card-content">
+            <div class="card-location">📍 Tunisia</div>
+
+            <h3>{{ event.name }}</h3>
+
+            <div class="card-bottom">
+              <div class="price">
+                <small>STARTING FROM</small>
+                <strong>{{ event.price }} <span>TND</span></strong>
+              </div>
+
+              <button
+                class="book-button"
+                (click)="openBooking(event)"
+              >
+                Book Now ↗
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div
+        class="empty-state"
+        *ngIf="!loading && !error && filteredEvents.length === 0"
+      >
+        No events found. Try another search.
+      </div>
+    </section>
+
+    <!-- RESERVATION + DEMO PAYMENT -->
+    <section class="reservation-section" *ngIf="orderId !== null">
+      <div class="reservation-box">
+        <div>
+          <span class="eyebrow">✦ YOUR RESERVATION</span>
+          <h2>Reservation #{{ orderId }}</h2>
+          <p>{{ bookingMessage }}</p>
+        </div>
+
+        <div class="reservation-actions">
+
+          <button
+            class="primary-btn"
+            (click)="payDemo()"
+            [disabled]="paying || ticketQrUrl !== null"
+            *ngIf="!ticketQrUrl"
+          >
+            {{ paying ? 'Processing Payment...' : 'Pay Now (Demo) 💳' }}
+          </button>
+
+          <button
+            class="secondary-btn"
+            (click)="viewMyTicket()"
+            [disabled]="paying"
+          >
+            View My Ticket 🎟️
+          </button>
+
+        </div>
+      </div>
+
+      <p *ngIf="bookingError" class="form-error">
+        {{ bookingError }}
+      </p>
+
+      <div class="ticket-preview" *ngIf="ticketQrUrl">
+        <span class="eyebrow">✦ PAYMENT CONFIRMED</span>
+        <h3>Your Digital Ticket</h3>
+        <p>Ticket #{{ ticketId }}</p>
+
+        <img
+          [src]="ticketQrUrl"
+          alt="Ticket QR Code"
+          width="220"
+          height="220"
+        />
+
+        <p>Present this QR code at the event entrance.</p>
+        <p><strong>Payment: DEMO — No real money charged.</strong></p>
+      </div>
+    </section>
+
+    <section class="how-section" id="how-it-works">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">✦ SIMPLE & EASY</span>
+          <h2>How It <span>Works.</span></h2>
+          <p>Three simple steps to your next experience.</p>
+        </div>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <span class="step-number">01</span>
+          <div class="step-icon">⌕</div>
+          <h3>Discover</h3>
+          <p>
+            Browse events and find your next unforgettable experience.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <span class="step-number">02</span>
+          <div class="step-icon">🎟</div>
+          <h3>Reserve & Pay</h3>
+          <p>
+            Choose your event, create a reservation,
+            and complete the demo payment.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <span class="step-number">03</span>
+          <div class="step-icon">▦</div>
+          <h3>Check In</h3>
+          <p>
+            Get your digital QR ticket and scan it
+            at the event entrance.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section" id="about">
+      <span class="eyebrow">✦ DON'T MISS OUT</span>
+      <h2>YOUR NEXT STORY<br><span>STARTS HERE.</span></h2>
+      <p>
+        Great moments deserve to be experienced, not just imagined.
+      </p>
+      <button class="primary-btn" (click)="scrollToEvents()">
+        Find Your Event ↗
+      </button>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-top">
+      <a class="brand" href="/">
+        <span class="brand-icon">✦</span>
+        EVENT<span class="brand-accent">LY</span>
+      </a>
+      <p>Discover. Experience. Remember.</p>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 EVENTLY. All rights reserved.</span>
+      <span>Made for unforgettable experiences.</span>
+    </div>
+  </footer>
+
+  <!-- BOOKING MODAL -->
+  <div
+    class="modal-backdrop"
+    *ngIf="selectedEvent"
+    (click)="closeBooking()"
+  >
+    <div
+      class="booking-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="booking-title"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        class="close-modal"
+        (click)="closeBooking()"
+        [disabled]="booking"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+      <span class="eyebrow">✦ BOOK YOUR EXPERIENCE</span>
+      <h2 id="booking-title">Reserve Your Ticket</h2>
+
+      <div class="modal-event">
+        <strong>{{ selectedEvent.name }}</strong>
+        <span>{{ selectedEvent.price }} TND</span>
+      </div>
+
+      <form (ngSubmit)="bookTicket()">
+        <label for="customer-email">Email Address</label>
+        <input
+          id="customer-email"
+          type="email"
+          name="email"
+          [(ngModel)]="customerEmail"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        />
+
+        <p class="form-error" *ngIf="bookingError">
+          {{ bookingError }}
+        </p>
+
+        <button
+          class="primary-btn submit-btn"
+          type="submit"
+          [disabled]="booking"
+        >
+          {{ booking ? 'Creating reservation...' : 'Confirm Reservation ↗' }}
+        </button>
+      </form>
+
+      <p class="modal-note">
+        Demo payment only. No real money will be charged.
+      </p>
+    </div>
+  </div>
+
+</div>

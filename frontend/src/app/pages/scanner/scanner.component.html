@@ -1,0 +1,49 @@
+
+
+<div class="scanner-container">
+  <h1>🎟️ Ticket Scanner</h1>
+  <p>Organizer Dashboard</p>
+
+  <div class="scanner-card">
+    <h2>Verify Event Ticket</h2>
+
+    <label>Organizer Key</label>
+    <input
+      type="password"
+      [(ngModel)]="checkinKey"
+      placeholder="Enter organizer key"
+    />
+
+    <label>Ticket Code</label>
+    <input
+      type="text"
+      [(ngModel)]="ticketCode"
+      placeholder="Enter or scan ticket code"
+    />
+
+    <button (click)="startScanner()" [disabled]="scanning">
+      📷 Scan QR Code
+    </button>
+
+    <button (click)="stopScanner()" *ngIf="scanning">
+      Stop Camera
+    </button>
+
+    <video
+      id="scanner-video"
+      autoplay
+      playsinline
+      [hidden]="!scanning"
+    ></video>
+
+    <button (click)="verifyTicket()">
+      Verify Ticket
+    </button>
+
+    <button (click)="checkIn()">
+      Confirm Check-in
+    </button>
+
+    <p *ngIf="message">{{ message }}</p>
+  </div>
+</div>
