@@ -1,0 +1,11 @@
+
+fastapi
+uvicorn
+sqlalchemy
+pymysql
+cryptography
+python-dotenv
+pydantic[email]
+qrcode[pil]
+pwdlib[argon2]
+PyJWT
