@@ -18,25 +18,20 @@ from admin_routes import router as admin_router
 load_dotenv()
 
 app = FastAPI(title="Event Ticket API")
-
 app.add_middleware(
     CORSMiddleware,
-    
-allow_origins=[
-    "http://localhost:4200",
-    "http://localhost:60251",
-    "https://event-ticket-platform-3bnp0i7f1-hedy1234567.vercel.app",
-    "https://event-ticket-platform-9zgmcx1g2-hedy1234567.vercel.app",
-    "https://event-ticket-platform-git-main-hedy1234567.vercel.app",
-],
-
+    allow_origins=[
+        "http://localhost:4200",
+        "http://localhost:60251",
+    ],
+    allow_origin_regex=r"https://event-ticket-platform(?:-[a-z0-9]+)?-hedy1234567\.vercel\.app",
     allow_credentials=False,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=[
         "Content-Type",
+        "Authorization",
         "X-Ticket-Token",
         "X-Checkin-Key",
-        "Authorization"
     ],
 )
 
