@@ -16,8 +16,7 @@ export class EventService {
 
   private http = inject(HttpClient);
 
-  private apiUrl = 'http://127.0.0.1:8001';
-
+private apiUrl = 'https://event-ticket-platform-production-d11d.up.railway.app';
   // GET ALL EVENTS
   getEvents(): Observable<Event[]> {
     return this.http.get<Event[]>(

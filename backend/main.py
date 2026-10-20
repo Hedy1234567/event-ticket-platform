@@ -23,7 +23,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:4200",
-        "http://localhost:60251"
+        "http://localhost:60251",
+        "https://vercel.com/hedy1234567"
     ],
     allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
