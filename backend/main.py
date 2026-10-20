@@ -21,11 +21,13 @@ app = FastAPI(title="Event Ticket API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:4200",
-        "http://localhost:60251",
-        "https://vercel.com/hedy1234567"
-    ],
+    
+allow_origins=[
+    "http://localhost:4200",
+    "http://localhost:60251",
+    "https://event-ticket-platform-9zgmcx1g2-hedy1234567.vercel.app",
+],
+
     allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=[
