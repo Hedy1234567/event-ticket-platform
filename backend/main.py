@@ -25,6 +25,7 @@ app.add_middleware(
 allow_origins=[
     "http://localhost:4200",
     "http://localhost:60251",
+    "https://event-ticket-platform-3bnp0i7f1-hedy1234567.vercel.app",
     "https://event-ticket-platform-9zgmcx1g2-hedy1234567.vercel.app",
     "https://event-ticket-platform-git-main-hedy1234567.vercel.app",
 ],
